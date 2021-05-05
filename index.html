@@ -76,7 +76,7 @@ var clouds = new THREE.Mesh(
     new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load( 'img/earth_clouds_1024.png' ), transparent: true,depthWrite:false, color: 0xaaaaaa })
 );
 earth.add( clouds );
-
+var xhpalsy1,xhpalsy2,xhpalsy3,xhpalsy4;
 var mains = [];
 var GLTFLoader = new THREE.GLTFLoader();
 	GLTFLoader.load( "img/qiu.gltf", function ( gltf ) {
@@ -86,13 +86,72 @@ var GLTFLoader = new THREE.GLTFLoader();
 	    thismodel.rotation.set(0,0,0)
 		thismodel.traverse( function ( child ) {
 			if ( child.isMesh ) {
-				mains.push(child);
+				child.material.transparent = true;
+				child.material.depthWrite = false
+				if(child.name == "polySurface2"){
+					child.visible = false;
+				}else{
+					mains.push(child);
+				}
 			}
-		});    
+		}); 
 		earth.add( thismodel );
+		
+		setTimeout(function(){
+			xhpalsy = setInterval(function () {		
+					mains[0].visible = false;
+				setTimeout(function(){
+					mains[0].visible = true;
+				},400)			 
+			}, 800);				
+		},200)
+	
+		setTimeout(function(){
+	xhpalsy1 = setInterval(function () {		
+			mains[1].visible = false;
+		setTimeout(function(){
+			mains[1].visible = true;
+		},400)			 
+	}, 800);			
+		},400)
+	
+		setTimeout(function(){
+		xhpalsy2 = setInterval(function () {
+			mains[2].visible = false;
+		setTimeout(function(){
+			mains[2].visible = true;
+		},400)			 
+	}, 800);		
+		},600)
+	
+		setTimeout(function(){
+		xhpalsy3 = setInterval(function () {
+			mains[3].visible = false;
+		setTimeout(function(){
+			mains[3].visible = true;
+		},400)			 
+	}, 800);		
+		},800)
+	
 	});  
 
 
+
+
+
+	
+
+	
+
+	
+	xhpalsy4 = setInterval(function () {
+			mains[4].visible = false;
+		setTimeout(function(){
+			mains[4].visible = true;
+		},400)			 
+	}, 800);
+	
+	
 document.addEventListener( 'mouseup', onDocumentMouseUp, false );
 document.addEventListener( 'mousemove', onDocumentMouseMove, false );  
 
@@ -126,11 +185,8 @@ function onDocumentMouseUp(event) {
     var intersects = raycaster.intersectObjects( mains );  	 
  
 	if ( intersects.length > 0 ) {
-	    if( intersects[0].object.name == "polySurface2" ){  
+	    if( intersects[0].object.name == "polySurface3" ){
 	    	window.open("biu.html");  
-	    	
-	    }else if( intersects[0].object.name == "polySurface3" ){
-	    	window.open("index2.html");  
 	    	
 	    }else if( intersects[0].object.name == "polySurface5" ){
 	    	window.open("index3.html");  
@@ -141,7 +197,7 @@ function onDocumentMouseUp(event) {
 	    }else if( intersects[0].object.name == "polySurface7" ){
 	    	window.open("index5.html");  
 	    	
-	    }else if( intersects[0].object.name == "polySurface9" ){
+	    }else if( intersects[0].object.name == "polySurface4" ){
 	    	window.open("index6.html");  
 	    	
 	    }
