@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">	
+
+<title>展示</title>
+
+<style>
+	canvas { width: 100%; height: 100% }
+
+	body{ 
+		border: none; 
+		overflow: hidden; 
+		margin: 0px; 
+	}
+</style>
+
+</head>
+
+<body>
+
+
+<script src="js/three.min.js"></script>
+<script src="js/OrbitControls.js"></script>
+<script src="js/GLTFLoader.js"></script>
+<script>
+	
+
+var	container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	
+var	camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+	camera.position.set(0,0,2000);
+	
+var	scene = new THREE.Scene();
+
+var hemiLight;
+    hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 1.3 );   
+	hemiLight.position.set( 0, 500, 0 );                                       
+	scene.add( hemiLight );                                                    
+
+var	renderer = new THREE.WebGLRenderer( { antialias: true } );
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	container.appendChild( renderer.domElement );
+	renderer.inputEncoding=true;
+	renderer.outputEncoding = THREE.GammaEncoding;
+
+var controls;
+    controls = new THREE.OrbitControls( camera, renderer.domElement );
+	controls.minDistance = 1300;    
+
+
+var textureMap1;
+var textureLoader = new THREE.TextureLoader();
+var materialNormalMap = new THREE.MeshPhongMaterial( {
+    specular: 0x999999,
+    shininess: 15,
+    map: textureLoader.load( "img/earth_lights_2048.png" ),
+    specularMap: textureLoader.load( "img/earth_lights_2048.png" ),
+    normalMap: textureLoader.load( "img/earth_normal_2048.jpg" ),
+    normalScale: new THREE.Vector2( 0.85, -0.85 ),
+    transparent: true,
+    opacity:0.95,
+    color:0x0072ff,
+    blending: THREE.AdditiveBlending,
+} );
+
+var earth = new THREE.Mesh(new THREE.SphereGeometry( 400, 50, 50 ),materialNormalMap );
+	earth.position.set( 0, 0, 0 );
+	earth.rotation.set(0,0,0);
+	scene.add( earth );
+
+var clouds = new THREE.Mesh(
+    new THREE.SphereGeometry( 410, 50, 50 ),
+    new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load( 'img/earth_clouds_1024.png' ), transparent: true,depthWrite:false, color: 0xaaaaaa })
+);
+earth.add( clouds );
+
+var mains = [];
+var GLTFLoader = new THREE.GLTFLoader();
+	GLTFLoader.load( "img/qiu.gltf", function ( gltf ) {
+	    thismodel = gltf.scene;                  
+	    thismodel.scale.set(5650,5650,5650)	
+	    thismodel.position.set(0,0,0)
+	    thismodel.rotation.set(0,0,0)
+		thismodel.traverse( function ( child ) {
+			if ( child.isMesh ) {
+				mains.push(child);
+			}
+		});    
+		earth.add( thismodel );
+	});  
+
+
+document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+document.addEventListener( 'mousemove', onDocumentMouseMove, false );  
+
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
+
+function onDocumentMouseMove(event) { 
+    event.preventDefault();
+	mouse.x = ( event.clientX / renderer.domElement.width) * 2 - 1;
+	mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+	raycaster.setFromCamera( mouse, camera );
+	var intersects1 = raycaster.intersectObjects( mains ); 
+	 
+	if ( intersects1.length > 0 ) {   
+		document.body.style.cursor = 'pointer';    
+		document.body.title='';	
+	}else{
+		document.body.style.cursor = 'auto';    
+		document.body.title='';
+	}
+} 
+
+
+function onDocumentMouseUp(event) {	
+    focus();  
+	event.preventDefault();
+	mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+	mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+	raycaster.setFromCamera( mouse, camera );
+
+    var intersects = raycaster.intersectObjects( mains );  	 
+ 
+	if ( intersects.length > 0 ) {
+	    if( intersects[0].object.name == "polySurface2" ){  
+	    	window.open("biu.html");  
+	    	
+	    }else if( intersects[0].object.name == "polySurface3" ){
+	    	window.open("index2.html");  
+	    	
+	    }else if( intersects[0].object.name == "polySurface5" ){
+	    	window.open("index3.html");  
+	    	
+	    }else if( intersects[0].object.name == "polySurface6" ){
+	    	window.open("index4.html");  
+	    	
+	    }else if( intersects[0].object.name == "polySurface7" ){
+	    	window.open("index5.html");  
+	    	
+	    }else if( intersects[0].object.name == "polySurface9" ){
+	    	window.open("index6.html");  
+	    	
+	    }
+	}
+ 
+}
+
+
+
+window.addEventListener( 'resize', onWindowResize, false );
+function onWindowResize( event ) {
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+}
+
+
+render();
+function render() {
+	requestAnimationFrame( render ); 
+	
+	earth.rotation.y+=0.001;
+	clouds.rotation.y-=0.0003;
+	clouds.rotation.z-=0.0004;
+	
+	controls.update();
+    renderer.clear();
+    renderer.render( scene, camera );
+}
+
+</script>
+
+	
+</body>
+</html>
