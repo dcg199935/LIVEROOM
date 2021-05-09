@@ -1,254 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RIDE ROOM</title>
-    <style>
-        *{
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;        
-        }
-        .hide{
-            display: none;
-        }
-        .car{
-            width: 50px;
-            height: 70px;
-            background-color: red;
-            position: absolute;
-            bottom: 120px;
-            background-image:url(car.png);
-            background-size: cover;
-        }
-        .GameArea{
-            width: 400px;
-            height: 100vh;
-            background-color: white;
-            margin: auto;
-            position: relative;
-            overflow: hidden;
-            border-left: 10px  white;
-            border-right:10px  white;
-        }
-        .lines{
-            width: 10px;
-            height: 100px;
-            background: #8d8c8c;
-            position: absolute;
-            margin-left: 195px;
-        }
-        .CarGame{
-            background-color:blue;
-            background-size: cover;
+<meta charset="utf-8">
+<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">	
 
-        }
-        .other{
-            width: 50px;
-            height: 70px;
-            background-color:#8d8c8c;
-            position: absolute;
-            bottom: 120px;
-        }
-        @font-face { font-family: Gameplay; src: url('Gameplay.ttf'); } 
-        .Score{
-            font-family:Gameplay;
-            position: absolute;
-            top: 15px;
-            left: 50px;
-            text-align: center;
-            padding-top: 23px;
-            font-size: 20px;
-            line-height: 20px;
-            background-color: #8d8c8c;
-            color: white;
-            width: 300px;
-            height: 100px;
-            box-shadow: 0 0 20px 0px rgba(0,0,0,0.1);
-            border-radius: 23px;
-        }
+<title>展示</title>
 
-@font-face { font-family: Gameplay; src: url('Gameplay.ttf'); } 
+<style>
+	canvas { width: 100%; height: 100% }
 
-        .StartScreen{
-            font-family:Gameplay;
-            position: absolute;
-            background-color:#8d8c8c;
-            color:#232424 ;
-            z-index: 1;
-            margin-top: 210px;
-            margin-left:440px;
-            padding: 22px;
-            text-align: center;
-            box-shadow: 0 0 20px 0px rgba(0,0,0,0.1);
-            font-size: 18px;
-            width: 50%;
-            height: 200px;
-            cursor: pointer;
-            border-radius: 23px;
+	body{ 
+		border: none; 
+		overflow: hidden; 
+		margin: 0px; 
+	}
 
-        }
-        button{
-            margin-top:15px;
-            padding: 10px;
-            text-align: center;
-            background-color: black;
-            color: white;
-        }
-    </style>
+	#l {
+		position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+}
+
+</style>
+
 </head>
+
 <body>
-    <div class="CarGame">
-        <div class="Score">
 
-        </div>
-        <div class="StartScreen">
-            <p>Start Game by clicking Here<br><br>Arrow Keys to move<br><br>If you hit another car you will loose</p>
-            <button onclick="Reset()">Reset Highest Score</button>
-        </div>
-        <div class="GameArea">
-
-        </div>
-    </div>       
-    <script>
-        const score=document.querySelector('.Score');
-        const startscreen=document.querySelector('.StartScreen');
-        const gamearea=document.querySelector('.GameArea');
-        let player={ speed:5,score:0};
-        let highest=0;
-        startscreen.addEventListener('click',start);
-
-        let keys={ArrowUp: false, ArrowDown: false, ArrowRight: false, ArrowLeft: false};
-
-        document.addEventListener('keydown',keyDown);
-        document.addEventListener('keyup',keyUp);
-        function keyDown(ev){
-            ev.preventDefault();
-            keys[ev.key]=true;
-
-        }
-        function keyUp(ev){
-            ev.preventDefault();
-            keys[ev.key]=false;
-            
-        }
-        function isCollide(a,b){
-            aRect=a.getBoundingClientRect();
-            bRect=b.getBoundingClientRect();
-
-            return !((aRect.bottom<bRect.top)||(aRect.top>bRect.bottom)||(aRect.right<bRect.left)||(aRect.left>bRect.right));
-        }
-        function moveLines(){
-            let lines=document.querySelectorAll('.lines');
-            lines.forEach(function(item){
-                if(item.y>=700){
-                    item.y-=750;
-                }
-                item.y+=player.speed;
-                item.style.top=item.y+'px';
-
-            })
-        }
-        function endGame(){
-            player.start=false;
-            startscreen.classList.remove('hide');
-        }
-        function moveCar(car){
-            let other=document.querySelectorAll('.other');
-            other.forEach(function(item){
-                if(isCollide(car,item)){
-                    console.log('HIT');
-                    endGame();
-                }
-                if(item.y>=750){
-                    item.y=-300;
-                    item.style.left=Math.floor(Math.random()*350) + 'px';
-                }
-                item.y+=player.speed;
-                item.style.top=item.y+'px';
-
-            })
-        }
-        function gamePlay(){
-
-            let car=document.querySelector('.car');
-            let road=gamearea.getBoundingClientRect();
-
-            if(player.start){
-
-                moveLines();
-                moveCar(car);
-                if(keys.ArrowUp && player.y>(road.top+70)){
-                    player.y-=player.speed;
-                }
-                if(keys.ArrowDown && player.y<(road.bottom-70)){
-                    player.y+=player.speed;
-                }
-                if(keys.ArrowLeft && player.x>0){
-                    player.x-=player.speed;
-                }
-                if(keys.ArrowRight && player.x<(road.width-50)){
-                    player.x+=player.speed;
-                }
-
-                car.style.top=player.y + 'px';
-                car.style.left=player.x + 'px';
-
-                window.requestAnimationFrame(gamePlay);
-                //console.log(player.score++);
-                player.score++;
-                if(player.score>=highest)
-                {
-                    highest=player.score;
-                }
-                score.innerHTML="Your Score:"+ player.score+"<br><br>"+"Highest Score:"+highest;
-
-
-            }
-            
-        }
-        function Reset(){
-            highest=0;
-        }
-        function start(){
-            //gamearea.classList.remove('hide');
-            startscreen.classList.add('hide');
-            gamearea.innerHTML="";
-
-            player.start=true;
-            player.score=0;
-            window.requestAnimationFrame(gamePlay);
-
-
-
-           for(x=0;x<5;x++){
-                let roadline=document.createElement('div');
-                roadline.setAttribute('class','lines');
-                roadline.y=(x*150);
-                roadline.style.top=roadline.y+'px';
-                gamearea.appendChild(roadline);
-            }
-            
-            let car=document.createElement('div');
-            car.setAttribute('class','car');
-            gamearea.appendChild(car);
-
-            player.x=car.offsetLeft;
-            player.y=car.offsetTop;
-
-
-            for(x=0;x<3;x++){
-                let othercar=document.createElement('div');
-                othercar.setAttribute('class','other');
-                othercar.y=((x+1)*350)* -1;
-                othercar.style.top=othercar.y+'px';
-                othercar.style.left=Math.floor(Math.random()*350) + 'px';
-                gamearea.appendChild(othercar);
-            }
-        }
-        
-    </script>
+	<video autoplay muted loop id="l">
+		<source src="l.mp4" type="video/mp4">
+	  </video>
+	
 </body>
 </html>
-
